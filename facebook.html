@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Content Generator - Blacki</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        body { font-family: 'Poppins', sans-serif; background-color: #f0f2f5; color: #1c1e21; }
+        .glass-card {
+            background: white;
+            box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+        /* Facebook Brand Colors */
+        .fb-blue { color: #1877f2; }
+        .bg-fb { background-color: #1877f2; }
+        .gradient-text {
+            background: linear-gradient(90deg, #1877f2, #0056b3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .btn-fb {
+            background-color: #1877f2;
+            transition: all 0.2s ease;
+        }
+        .btn-fb:hover { background-color: #166fe5; transform: scale(1.02); }
+        .social-btn { transition: all 0.3s ease; }
+        .social-btn:hover { transform: translateY(-5px); }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold mb-2"><i class="fab fa-facebook mr-2 fb-blue"></i>Facebook <span class="gradient-text">Content Generator</span></h1>
+            <p class="text-slate-600">Buat Postingan Grup & Status Viral dalam hitungan detik!</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="glass-card p-6 rounded-2xl">
+                <div class="flex mb-6 space-x-2 bg-slate-100 p-1 rounded-lg">
+                    <button onclick="switchTab('ide')" id="tab-ide" class="flex-1 py-2 rounded-md bg-white shadow-sm fb-blue font-semibold">
+                        <i class="fas fa-edit mr-2"></i>Status/Ide
+                    </button>
+                    <button onclick="switchTab('foto')" id="tab-foto" class="flex-1 py-2 rounded-md text-slate-500">
+                        <i class="fas fa-image mr-2"></i>Foto Produk
+                    </button>
+                </div>
+
+                <div id="input-section">
+                    <div id="ide-input">
+                        <label class="block text-sm font-semibold mb-2">Apa yang Anda pikirkan?</label>
+                        <textarea id="prompt-text" rows="4" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-black" placeholder="Contoh: Jualan madu murni atau tips otomotif..."></textarea>
+                    </div>
+
+                    <div id="foto-input" class="hidden">
+                        <label class="block text-sm font-semibold mb-2">Upload Foto Produk/Kegiatan</label>
+                        <div class="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center cursor-pointer hover:border-blue-500 transition-colors" onclick="document.getElementById('file-upload').click()">
+                            <i class="fas fa-images text-3xl mb-2 text-slate-400"></i>
+                            <p class="text-sm text-slate-500">Klik untuk tambah foto</p>
+                            <input type="file" id="file-upload" class="hidden" accept="image/*" onchange="handleFileUpload(event)">
+                            <div id="preview-container" class="mt-4 hidden">
+                                <img id="img-preview" class="h-32 mx-auto rounded-lg shadow-md border-2 border-white">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label class="block text-sm font-semibold mb-2">Pilih Gaya Postingan</label>
+                    <select id="style-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-black">
+                        <option value="storytelling">Storytelling (Bercerita/Curhat)</option>
+                        <option value="tips">Tips & Trik (Informatif)</option>
+                        <option value="jualan">Hard Sell (Langsung Jualan)</option>
+                        <option value="diskusi">Diskusi (Pancing Komentar)</option>
+                        <option value="formal">Pengumuman (Resmi)</option>
+                    </select>
+                </div>
+
+                <button onclick="generateScript()" class="w-full mt-8 py-3 rounded-xl btn-fb font-bold text-white shadow-lg uppercase tracking-wide">
+                    BUAT POSTINGAN <i class="fas fa-paper-plane ml-2"></i>
+                </button>
+            </div>
+
+            <div class="glass-card p-6 rounded-2xl flex flex-col">
+                <div class="flex justify-between items-center mb-4 border-b pb-3">
+                    <h2 class="font-bold text-lg text-slate-800"><i class="fas fa-align-left mr-2 fb-blue"></i>Draft Postingan</h2>
+                    <button onclick="copyToClipboard()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-bold transition-colors">
+                        <i class="fas fa-copy mr-1"></i> SALIN TEKS
+                    </button>
+                </div>
+                <div id="script-result" class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex-grow overflow-y-auto text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
+                    Draft postingan Facebook Anda akan muncul di sini...
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-12 mb-8">
+            <h3 class="text-center text-slate-500 mb-6 text-sm uppercase tracking-widest font-bold">Support Kreator (Blacki)</h3>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="https://youtube.com/@blacki-2?sub_confirmation=1" target="_blank" class="social-btn flex items-center bg-[#FF0000] px-6 py-3 rounded-full text-white font-bold shadow-md">
+                    <i class="fab fa-youtube mr-2 text-xl"></i> YouTube
+                </a>
+                <a href="https://tiktok.com/@blackiimut2" target="_blank" class="social-btn flex items-center bg-black px-6 py-3 rounded-full text-white font-bold shadow-md">
+                    <i class="fab fa-tiktok mr-2 text-xl"></i> TikTok
+                </a>
+                <a href="https://saweria.co/Blacki2" target="_blank" class="social-btn flex items-center bg-[#faae2b] px-6 py-3 rounded-full text-black font-bold shadow-md">
+                    <i class="fas fa-donate mr-2 text-xl"></i> Saweria
+                </a>
+            </div>
+        </div>
+
+        <footer class="text-center text-slate-400 text-xs mt-10 pb-10">
+            &copy; 2024 Built with ❤️ by Blacki Script Generator
+        </footer>
+    </div>
+
+    <script>
+        let currentMode = 'ide';
+
+        function switchTab(mode) {
+            currentMode = mode;
+            const tabIde = document.getElementById('tab-ide');
+            const tabFoto = document.getElementById('tab-foto');
+            const ideInput = document.getElementById('ide-input');
+            const fotoInput = document.getElementById('foto-input');
+
+            if (mode === 'ide') {
+                tabIde.classList.add('bg-white', 'shadow-sm', 'fb-blue');
+                tabIde.classList.remove('text-slate-500');
+                tabFoto.classList.remove('bg-white', 'shadow-sm', 'fb-blue');
+                tabFoto.classList.add('text-slate-500');
+                ideInput.classList.remove('hidden');
+                fotoInput.classList.add('hidden');
+            } else {
+                tabFoto.classList.add('bg-white', 'shadow-sm', 'fb-blue');
+                tabFoto.classList.remove('text-slate-500');
+                tabIde.classList.remove('bg-white', 'shadow-sm', 'fb-blue');
+                tabIde.classList.add('text-slate-500');
+                fotoInput.classList.remove('hidden');
+                ideInput.classList.add('hidden');
+            }
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview-container').classList.remove('hidden');
+                    document.getElementById('img-preview').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function generateScript() {
+            const prompt = document.getElementById('prompt-text').value;
+            const style = document.getElementById('style-select').value;
+            const resultBox = document.getElementById('script-result');
+            
+            resultBox.innerText = "✍️ Sedang menulis postingan yang menarik untukmu...";
+
+            setTimeout(() => {
+                let content = "";
+                const topic = prompt || "produk/layanan kami";
+
+                if (style === 'storytelling') {
+                    content = `Dulu saya sempat bingung... 🤔\n\nSetiap kali mau ${topic}, rasanya kok susah banget ya. Sampai akhirnya saya nemu satu cara/produk yang bener-bener ngerubah segalanya.\n\nGak nyangka banget, ternyata kuncinya cuma di sini. Temen-temen ada yang pernah ngalamin hal yang sama gak? \n\nCek foto di bawah ya buat liat detailnya! 👇\n\n#Sharing #KisahNyata #Inspirasi #${topic.replace(/\s+/g, '')}`;
+                } else if (style === 'tips') {
+                    content = `Tips Gratis buat Bapak/Ibu sekalian! ✨\n\nBanyak yang nanya ke saya, gimana sih cara optimal buat ${topic}? Nah, ini 3 rahasia simpelnya:\n\n1️⃣ Jangan asal pilih, pastikan kualitas nomor satu.\n2️⃣ Konsisten adalah kunci.\n3️⃣ Pakai alat/produk yang tepat.\n\nSemoga bermanfaat ya! Jangan lupa SHARE postingan ini ke kronologi Anda biar gak ilang. 😊\n\n#TipsBermanfaat #Edukasi #SharingIlmu`;
+                } else if (style === 'jualan') {
+                    content = `🔥 PROMO KHUSUS HARI INI SAJA! 🔥\n\nSiapa lagi yang mau ${topic} tapi gak mau ribet? Kabar gembira buat warga FB semua!\n\nKenapa harus pilih kami?\n✅ Kualitas Terjamin\n✅ Harga Bersahabat\n✅ Pelayanan Cepat\n\nSTOK TERBATAS! Langsung aja amankan slotnya sekarang.\n\n👇 KLIK LINK WHATSAPP DI BAWAH:\nwa.me/628123456789 (Contoh)\n\nAtau komen "SAYA MAU" nanti kami inbox detailnya! 🚀`;
+                } else if (style === 'diskusi') {
+                    content = `Lagi rame banget nih bahas soal ${topic}... 🧐\n\nKalau menurut pendapat temen-temen di grup ini, mendingan pilih yang versi A atau B sih? Jujur saya masih bimbang.\n\nCoba tulis di kolom komentar ya alasannya apa, siapa tahu bisa jadi referensi buat yang lain juga. 👇\n\n#Diskusi #TanyaJawab #GrupFB`;
+                } else {
+                    content = `PENGUMUMAN PENTING\n\nSehubungan dengan tingginya permintaan terhadap ${topic}, kami informasikan bahwa saat ini layanan/produk tersebut sudah tersedia kembali.\n\nTerima kasih atas kepercayaan Anda kepada kami selama ini. Untuk informasi pemesanan dan jadwal, silakan hubungi admin di jam kerja.\n\nSalam Hangat,\nAdmin Blacki`;
+                }
+
+                resultBox.innerText = content;
+            }, 1000);
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('script-result').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Teks postingan berhasil disalin! Silakan tempel di Facebook Anda.");
+            });
+        }
+    </script>
+</body>
+</html>

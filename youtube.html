@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Content Generator - Blacki</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        body { font-family: 'Roboto', sans-serif; background-color: #0f0f0f; color: white; }
+        .glass-card {
+            background: #1e1e1e;
+            border: 1px solid #333;
+        }
+        .yt-red { color: #ff0000; }
+        .bg-yt { background-color: #ff0000; }
+        .gradient-text {
+            background: linear-gradient(90deg, #ff0000, #ff4d4d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .btn-yt {
+            background-color: #ff0000;
+            transition: all 0.2s ease;
+        }
+        .btn-yt:hover { background-color: #cc0000; transform: scale(1.02); }
+        .social-btn { transition: all 0.3s ease; }
+        .social-btn:hover { transform: translateY(-5px); }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1e1e1e; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+    <div class="max-w-5xl mx-auto">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold mb-2"><i class="fab fa-youtube mr-2 yt-red"></i>YouTube <span class="gradient-text">Studio Helper</span></h1>
+            <p class="text-slate-400">Buat Script Video, Judul Clickbait & Deskripsi dalam sekejap!</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="glass-card p-6 rounded-xl">
+                <div class="flex mb-6 space-x-2 bg-zinc-800 p-1 rounded-lg">
+                    <button onclick="switchTab('ide')" id="tab-ide" class="flex-1 py-2 rounded-md bg-zinc-700 text-white font-semibold">
+                        <i class="fas fa-video mr-2"></i>Ide Video
+                    </button>
+                    <button onclick="switchTab('foto')" id="tab-foto" class="flex-1 py-2 rounded-md text-slate-400">
+                        <i class="fas fa-camera mr-2"></i>Analisis Thumbnail
+                    </button>
+                </div>
+
+                <div id="input-section">
+                    <div id="ide-input">
+                        <label class="block text-sm font-medium mb-2 text-slate-300">Topik Video atau Nama Produk</label>
+                        <textarea id="prompt-text" rows="4" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Contoh: Tutorial masak nasi goreng tanpa api..."></textarea>
+                    </div>
+
+                    <div id="foto-input" class="hidden">
+                        <label class="block text-sm font-medium mb-2 text-slate-300">Upload Konsep Thumbnail/Produk</label>
+                        <div class="border-2 border-dashed border-zinc-700 rounded-xl p-8 text-center cursor-pointer hover:border-red-600 transition-colors" onclick="document.getElementById('file-upload').click()">
+                            <i class="fas fa-file-image text-3xl mb-2 text-zinc-500"></i>
+                            <p class="text-sm text-zinc-400">Klik untuk upload gambar</p>
+                            <input type="file" id="file-upload" class="hidden" accept="image/*" onchange="handleFileUpload(event)">
+                            <div id="preview-container" class="mt-4 hidden">
+                                <img id="img-preview" class="h-32 mx-auto rounded-lg shadow-lg">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label class="block text-sm font-medium mb-2 text-slate-300">Format Video</label>
+                    <select id="style-select" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-red-600 text-sm">
+                        <option value="long">Video Durasi Panjang (Vlog/Review)</option>
+                        <option value="shorts">YouTube Shorts (Vertikal)</option>
+                        <option value="tutorial">Tutorial / How To (Langkah-langkah)</option>
+                        <option value="storytelling">Storytelling / Dokumenter</option>
+                        <option value="news">Berita / Update Terkini</option>
+                    </select>
+                </div>
+
+                <button onclick="generateScript()" class="w-full mt-8 py-3 rounded-xl btn-yt font-bold text-white shadow-lg uppercase tracking-wider">
+                    GENERATE YOUTUBE KIT <i class="fas fa-magic ml-2"></i>
+                </button>
+            </div>
+
+            <div class="glass-card p-6 rounded-xl flex flex-col min-h-[500px]">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="font-bold text-lg"><i class="fas fa-clapperboard mr-2 yt-red"></i>YouTube Studio Pack</h2>
+                    <button onclick="copyToClipboard()" class="text-xs bg-zinc-700 hover:bg-zinc-600 px-3 py-1.5 rounded-lg transition-colors">
+                        <i class="fas fa-copy mr-1"></i> Copy All
+                    </button>
+                </div>
+                <div id="script-result" class="bg-black/50 border border-zinc-800 rounded-xl p-4 flex-grow overflow-y-auto text-sm leading-relaxed whitespace-pre-wrap">
+                    Draft video Anda akan muncul di sini (Judul, Script, Deskripsi, & Tag)...
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-12 mb-8 bg-zinc-900/50 p-8 rounded-3xl border border-zinc-800">
+            <h3 class="text-center text-slate-400 mb-6 text-xs uppercase tracking-[0.2em] font-bold">Mampir ke Channel Blacki Bang</h3>
+            <div class="flex flex-wrap justify-center gap-6">
+                <a href="https://youtube.com/@blacki-2?sub_confirmation=1" target="_blank" class="social-btn group flex flex-col items-center">
+                    <div class="bg-[#FF0000] w-14 h-14 rounded-2xl flex items-center justify-center mb-2 shadow-lg group-hover:rotate-6 transition-transform">
+                        <i class="fab fa-youtube text-2xl text-white"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-300">SUBSCRIBE</span>
+                </a>
+                <a href="https://tiktok.com/@blackiimut2" target="_blank" class="social-btn group flex flex-col items-center">
+                    <div class="bg-white w-14 h-14 rounded-2xl flex items-center justify-center mb-2 shadow-lg group-hover:-rotate-6 transition-transform">
+                        <i class="fab fa-tiktok text-2xl text-black"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-300">FOLLOW</span>
+                </a>
+                <a href="https://saweria.co/Blacki2" target="_blank" class="social-btn group flex flex-col items-center">
+                    <div class="bg-[#faae2b] w-14 h-14 rounded-2xl flex items-center justify-center mb-2 shadow-lg group-hover:scale-110 transition-transform">
+                        <i class="fas fa-donate text-2xl text-black"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-300">DAWET</span>
+                </a>
+            </div>
+        </div>
+
+        <footer class="text-center text-slate-600 text-[10px] mt-10">
+            Created for Blacki Community &copy; 2024
+        </footer>
+    </div>
+
+    <script>
+        let currentMode = 'ide';
+
+        function switchTab(mode) {
+            currentMode = mode;
+            const tabIde = document.getElementById('tab-ide');
+            const tabFoto = document.getElementById('tab-foto');
+            const ideInput = document.getElementById('ide-input');
+            const fotoInput = document.getElementById('foto-input');
+
+            if (mode === 'ide') {
+                tabIde.classList.add('bg-zinc-700', 'text-white');
+                tabFoto.classList.remove('bg-zinc-700', 'text-white');
+                ideInput.classList.remove('hidden');
+                fotoInput.classList.add('hidden');
+            } else {
+                tabFoto.classList.add('bg-zinc-700', 'text-white');
+                tabIde.classList.remove('bg-zinc-700', 'text-white');
+                fotoInput.classList.remove('hidden');
+                ideInput.classList.add('hidden');
+            }
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview-container').classList.remove('hidden');
+                    document.getElementById('img-preview').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function generateScript() {
+            const prompt = document.getElementById('prompt-text').value;
+            const style = document.getElementById('style-select').value;
+            const resultBox = document.getElementById('script-result');
+            
+            resultBox.innerText = "🎬 Sedang memproses YouTube Kit lengkap...";
+
+            setTimeout(() => {
+                let content = "";
+                const topic = prompt || "Video Keren";
+                
+                content = `[JUDUL CLICKBAIT]\n1. "RAHASIA TERBONGKAR! Inilah Cara ${topic} Yang Gak Pernah Dikasih Tahu!"\n2. "Jangan Sampai Menyesal, Tonton Ini Sebelum Kamu Mencoba ${topic}!"\n\n`;
+                
+                content += `[SCRIPT VIDEO - STYLE: ${style.toUpperCase()}]\n`;
+                if (style === 'shorts') {
+                    content += `0-3s: (Hook Visual) "Kalian tau gak kalau ${topic} bisa gini?!"\n3-10s: (Highlight) "Gak butuh waktu lama, hasilnya langsung keliatan banget."\n10-15s: (CTA) "Subscribe buat tips harian lainnya!"\n\n`;
+                } else {
+                    content += `Intro (0:00-1:00): "Halo kawan-kawan! Balik lagi di channel saya. Hari ini kita bahas tuntas soal ${topic} yang lagi viral."\nIsi (1:00-8:00): Jelaskan detail poin-poin penting ${topic} secara mendalam.\nOutro: "Makasih udah nonton, jangan lupa LIKE, COMMENT, dan SHARE!"\n\n`;
+                }
+
+                content += `[DESKRIPSI VIDEO]\nBanyak yang nanya soal ${topic}, makanya di video kali ini saya kupas tuntas semuanya buat kalian. Jangan diskip ya!\n\nDukung channel ini lewat Saweria: https://saweria.co/Blacki2\nSubscribe channel: youtube.com/@blacki-2\n\n`;
+                
+                content += `[TAGS & KEYWORDS]\n#${topic.replace(/\s+/g, '')} #YouTubeIndonesia #Tutorial #TipsViral #Trending #BlackiContent`;
+
+                resultBox.innerText = content;
+            }, 1200);
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('script-result').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("YouTube Kit berhasil disalin! Silakan tempel di Studio Anda.");
+            });
+        }
+    </script>
+</body>
+</html>
